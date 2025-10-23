@@ -1,0 +1,43 @@
+cabal-version:       3.0
+name:                integral-parallel
+version:             0.1.0.0
+build-type:          Simple
+
+-- library that builds tests and executable
+library
+  hs-source-dirs:      src
+  exposed-modules:     Numerics.Integrate
+  build-depends:
+      base >=4.14 && <5
+    , parallel >=3.2
+    , deepseq >=1.4
+    , containers
+  default-language:    Haskell2010
+  ghc-options:         -O2 -threaded -rtsopts
+
+-- executable
+executable integral-parallel
+  hs-source-dirs:      app
+  main-is:             Main.hs
+  build-depends:
+      base >=4.14 && <5
+    , integral-parallel
+    , parallel
+    , deepseq
+  default-language:    Haskell2010
+  ghc-options:         -O2 -threaded -rtsopts
+
+-- Tests (Hspec)
+test-suite integral-parallel-test
+  type:                exitcode-stdio-1.0
+  hs-source-dirs:      test
+  main-is:             Spec.hs
+  build-depends:
+      base >=4.14 && <5
+    , integral-parallel
+    , hspec >=2.10
+    , deepseq
+    , parallel
+  build-tool-depends:  hspec-discover:hspec-discover
+  ghc-options:         -threaded -rtsopts -O2
+  default-language:    Haskell2010
