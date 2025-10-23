@@ -1,7 +1,6 @@
 # Integral Parallel — Multithreaded Integration in Haskell
 
 [![Haskell](https://img.shields.io/badge/Language-Haskell-5D4F85?style=for-the-badge&logo=haskell)](https://www.haskell.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 [![Build](https://img.shields.io/badge/Build-Passing-brightgreen?style=for-the-badge)]()
 
 A multithreaded application written in **Haskell (GHC)** that computes definite integrals using the **Simpson’s method** with adaptive accuracy control.  
@@ -15,19 +14,22 @@ This lab project demonstrates how to build **parallel numerical computations** i
 The program estimates definite integrals for several mathematical functions, supports configurable precision (`ε`),  
 and scales across multiple threads.
 
-## Project Structure
+## 📂 Project Structure
+
+```text
 integral-parallel/
- ├─ app/
- │   └─ Main.hs               # CLI entry point
- ├─ src/
- │   └─ Numerics/
- │       └─ Integrate.hs      # Parallel Simpson integration logic
- ├─ test/
- │   ├─ Spec.hs               # Hspec test discovery
- │   └─ NumericsSpec.hs       # Unit tests for integration
- ├─ integral-parallel.cabal    # Project configuration
- ├─ cabal.project.local        # Local build/test settings
- └─ README.md                  # (This file)
+├── app/
+│   └── Main.hs               # CLI entry point
+├── src/
+│   └── Numerics/
+│       └── Integrate.hs      # Parallel Simpson integration logic
+├── test/
+│   ├── Spec.hs               # Hspec test discovery
+│   └── NumericsSpec.hs       # Unit tests for integration
+├── integral-parallel.cabal   # Project configuration
+├── cabal.project.local       # Local build/test settings
+└── README.md                 # (This file)
+
 
 ### Features
 - ✅ Parallel computation using multiple CPU cores  
@@ -50,12 +52,21 @@ integral-parallel/
 
 ---
 
-## Algorithm — Simpson’s Rule
+## 🧮 Algorithm — Simpson’s Rule
 
-The definite integral of `f(x)` on `[a, b]` is approximated as:
+The **Simpson’s rule** is used to approximate the definite integral of a continuous function `f(x)` on an interval `[a, b]`.
+
+It divides the range into an even number of subintervals `n`, each of width `h = (b - a) / n`, and applies weighted summation to estimate the area under the curve.
+
+### Formula
 
 \[
-I_n = \frac{h}{3} \sum_{i=0}^{n} w_i f(x_i), \quad
+I_n = \frac{h}{3} \sum_{i=0}^{n} w_i f(x_i)
+\]
+
+where the weights \( w_i \) are defined as:
+
+\[
 w_i =
 \begin{cases}
 1, & i = 0, n \\
@@ -76,20 +87,16 @@ cabal clean
 cabal v2-update
 cabal v2-build
 
-### Running the Application
-Example: integrate sin(x) from 0 to π using 4 threads and precision 1e-9.
+## Running the Application
+
+Example: integrate `sin(x)` from `0` to `π` using **4 threads** and precision **1e-9**.
+
+### Command
+
+```bash
 cabal v2-run integral-parallel -- \
   --a 0 --b 3.1415926535 --eps 1e-9 --func sin --threads 4 +RTS -N4 -s
 
-### Testing
+## Testing
+```bash
 cabal v2-test
-
-###Example Output
-Numerics
-  Simpson integration
-    computes ∫₀^π sin(x) dx ≈ 2.0 [✔]
-    computes ∫₀¹ (x+1)^2 dx = 7/3 ≈ 2.3333 [✔]
-    converges faster with higher n0 [✔]
-
-Finished in 0.002s
-3 examples, 0 failures
