@@ -39,6 +39,14 @@ simpsonParallel chunk f a b n
             in  fromIntegral w * f x
       in  (h/3) * parSumChunked chunk step xs
 
+
+simpsonSeq :: (Double -> Double) -> Double -> Double -> Int -> Double
+simpsonSeq f a b n =
+  let h = (b - a) / fromIntegral n
+      s1 = sum [f (a + fromIntegral (2*k-1) * h) | k <- [1 .. n `div` 2]]
+      s2 = sum [f (a + fromIntegral (2*k)   * h) | k <- [1 .. n `div` 2 - 1]]
+  in (h/3) * (f a + f b + 4*s1 + 2*s2)
+
 -- adaptive refinement based on accuracy ε
 refineUntilEps :: Int -> (Double->Double) -> Double -> Double -> Double
                -> Int -> Int -> (Double, Int)
