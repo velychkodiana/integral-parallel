@@ -1,101 +1,131 @@
-#  Functional Programming Lab 2 — Haskell Parallel Integration Project
+# Multithreaded Numerical Integration in Haskell
 
-##  Project Overview
+This project implements **parallel numerical integration** using the **Simpson method** with **adaptive refinement to a target precision ε**.  
+The program demonstrates **concurrency and parallel evaluation** in a pure functional setting using:
 
-  This project implements a **multithreaded numerical integration system** in **Haskell**, using the **Simpson’s method** with adaptive accuracy control.  
-  The goal is to demonstrate parallel computation, functional decomposition, and runtime performance scaling via the GHC threaded runtime system.
+- `Control.Parallel.Strategies` for controlled parallel computation
+- `deepseq` for deterministic evaluation
+- `hspec` for correctness and convergence tests
 
-  The application supports integration of several functions (`sin`, `cos`, `exp`, `poly`), adaptive refinement by precision `ε`, and configurable multithreading.
-
----
-
-## 📦 Versions and Requirements
-
-| Tool / Dependency | Version / Notes |
-| ------------------ | --------------- |
-| **GHC** | 9.6.7 |
-| **Cabal** | 3.10+ |
-| **IntelliJ IDEA** | 2023.3+ (with Haskell plugin) |
-| **Libraries** | `parallel`, `deepseq`, `containers`, `hspec` |
-| **OS Tested** | macOS (ARM64), Ubuntu 22.04 |
+The application supports several predefined functions and can run both **sequential** and **parallel** integration for performance comparison.
 
 ---
 
-##  Motivation & Authors
+##  Requirements
 
-This project was developed as part of the **Functional Programming course** to explore:
-- Parallel evaluation in **pure functional languages**
-- **Lazy evaluation** and performance trade-offs
-- Designing reproducible **numerical algorithms** in Haskell
-- Using **testing frameworks** to verify convergence and correctness
+| Component | Version / Notes |
+|----------|----------------|
+| GHC      | 9.6.7+
+| Cabal    | 3.10+
+| Libraries | `parallel`, `deepseq`, `hspec`
+| IDE (optional) | IntelliJ IDEA + Haskell plugin
+| OS Tested | macOS ARM64 / Linux compatible |
 
------
+---
 
-##  Technologies & Setup
+##  Purpose of the Project
 
-| Component | Detail |
-| :--- | :--- |
-| **Language** | **Haskell** |
-| **Compiler** | GHC 9.6.7+ |
-| **Build Tool** | Cabal |
-| **Parallelism** | `Control.Parallel.Strategies`, `deepseq` |
-| **Testing** | Hspec |
+This project was developed as part of the **Functional Programming** course to:
 
-### Project Structure
+- Apply **Simpson’s numerical integration algorithm**
+- Implement **parallelization via strategies**
+- Analyze **speedup** and **scaling behavior**
+- Use **testing** to validate algorithm correctness and convergence
 
-```text
+---
+
+##  Project Structure
+
+```
+
 integral-parallel/
 ├── app/
-│   └── Main.hs               # CLI entry point and main logic
+│   └── Main.hs                  # CLI entry point (runs seq + parallel comparison)
 ├── src/
-│   └── Numerics/
-│       └── Integrate.hs      # Parallel Simpson integration core
+│   └── Numerics/
+│       ├── Funcs.hs             # Standard functions to integrate (sin, exp, polynomial)
+│       ├── SimpsonSeq.hs        # Sequential Simpson integration
+│       ├── SimpsonPar.hs        # Parallel Simpson integration (chunking + parListChunk)
+│       └── Refine.hs            # Adaptive refinement until target epsilon is reached
 ├── test/
-│   ├── Spec.hs               # Hspec test discovery
-│   └── NumericsSpec.hs       # Unit tests for integration logic
-└── integral-parallel.cabal   # Project configuration
-```
+│   ├── Spec.hs                  # hspec-discover entry
+│   ├── SimpsonSpec.hs           # Mathematical correctness & consistency tests
+│   ├── RefinementSpec.hs        # Tests for adaptive precision refinement
+│   └── PerformanceSpec.hs       # Seq vs Par consistency & performance sanity
+└── integral-parallel.cabal      # Build configuration
 
-### Build Instructions
+````
 
-To prepare the project, run the following commands:
+---
+
+## Build Instructions
 
 ```bash
-cabal clean
+cabal v2-clean
 cabal v2-update
 cabal v2-build
-```
+````
 
------
+---
 
-##  Running the Application
+## Running the Program
 
-  Execute the application using **`cabal v2-run`**. To fully enable parallelism, you **must** include the **GHC Runtime System (RTS) flags** (e.g., `+RTS -N4 -s`) *after* the main application arguments (`--`).
-
-### Example: Integrate $sin(x)$
-
-Integrate $sin(x)$ from **0** to **$\pi$** using **4 threads** and a precision of **$10^{-9}$**.
+Basic run:
 
 ```bash
-cabal v2-run integral-parallel -- \
-  --a 0 \
-  --b 3.1415926535 \
-  --eps 1e-9 \
-  --func sin \
-  --threads 4 \
-  +RTS -N4 -s
+cabal v2-run
 ```
 
-  * **`+RTS -N4`**: Instructs the GHC RTS to use a maximum of 4 processor cores.
-  * **`-s`**: Prints runtime statistics, including garbage collection and parallel execution time.
+Run with full **parallel runtime statistics**:
+
+```bash
+cabal v2-run -- -- +RTS -N -s
+```
+
+Run using **4 threads explicitly**:
+
+```bash
+cabal v2-run -- -- +RTS -N4 -s
+```
+
+---
+
+##  Example: Integrate `sin(x)` on [0, π] with ε = 1e-8
+
+```bash
+cabal v2-run -- --func sin --a 0 --b 3.1415926535 --eps 1e-8 +RTS -N4 -s
+```
+
+Meaning:
+
+| Flag         | Description                     |
+| ------------ | ------------------------------- |
+| `--func`     | Function (`sin`, `exp`, `poly`) |
+| `--a`, `--b` | Integration bounds              |
+| `--eps`      | Target precision                |
+| `+RTS -N4`   | Use 4 CPU threads               |
+| `-s`         | Show GC & CPU timing statistics |
+
+---
 
 ##  Testing
 
-Run the full suite of unit tests with:
+Run all tests:
 
 ```bash
-cabal v2-test
+cabal v2-test --test-show-details=direct
 ```
 
-**Author:** *Diana Velychko*  
-**Year:** 2025
+What is tested:
+
+| Test Group        | Purpose                                             |
+| ----------------- | --------------------------------------------------- |
+| `SimpsonSpec`     | Numerical correctness of Simpson’s rule             |
+| `RefinementSpec`  | Ensure adaptive refinement reaches target precision |
+| `PerformanceSpec` | Parallel result matches sequential result           |
+
+All core requirements are automatically verified.
+
+---
+
+**Author:** *Diana Velychko* **Year:** 2025
