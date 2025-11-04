@@ -127,5 +127,27 @@ What is tested:
 All core requirements are automatically verified.
 
 ---
+##  Testing output
+Performance
+  Performance sanity checks
+    parallel matches sequential at moderate n [✔]
+Refinement
+  Adaptive refinement of subintervals to reach target ε
+    Refinement achieves requested precision on ∫₀^π sin(x) dx [✔]
+    Looser ε should not require more subintervals than stricter ε [✔]
+Simpson
+  Simpson Rule — Mathematical Correctness
+    ∫₀^π sin(x) dx = 2 (sequential) [✔]
+    ∫₀^1 (x+1)^2 dx = 7/3 (sequential) [✔]
+  Sequential vs Parallel Consistency
+    Parallel gives the same result as sequential for sin on [0, π] [✔]
+    Parallel matches sequential for exp on [0, 1] [✔]
+  Input Validation
+    Rejects odd subdivision counts (n must be even) [✔]
+
+Finished in 0.0406 seconds
+8 examples, 0 failures
+
+---
 
 **Author:** *Diana Velychko* **Year:** 2025
