@@ -128,7 +128,8 @@ All core requirements are automatically verified.
 
 ---
 ##  Testing output
-``
+
+```
 Performance
   Performance sanity checks
     parallel matches sequential at moderate n [✔]
@@ -149,7 +150,7 @@ Simpson
 Finished in 0.0406 seconds
 8 examples, 0 failures
 
-``
+```
 ---
 
 **Author:** *Diana Velychko* **Year:** 2025
